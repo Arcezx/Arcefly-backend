@@ -1,0 +1,24 @@
+package com.example.prueba;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    @Autowired
+    private AuthService authService;
+
+    @PostMapping("/login")
+    public String login(@RequestBody User loginUser) {
+        System.out.println("Usuario recibido: " + loginUser.getUsername());
+        System.out.println("Contraseña recibida: " + loginUser.getPassword());
+
+        if (authService.authenticate(loginUser.getUsername(), loginUser.getPassword())) {
+            return "Login exitoso";
+        }
+        return "Credenciales incorrectas";
+    }
+ 
+
+}

@@ -1,0 +1,14 @@
+package com.example.prueba.dtos.responses;
+
+import java.time.LocalDate;
+
+public record ReservaResponse(
+        Integer idReserva,
+        Integer idViaje,
+        Long idUsuario,
+        LocalDate fechaReserva,
+        String asiento,
+        String estado,  // Cambiado de estadoViaje a estado
+        String origen,
+        String destino
+) {}

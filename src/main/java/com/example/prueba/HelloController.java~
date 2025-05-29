@@ -1,0 +1,8 @@
+package com.example.prueba;
+
+public class HelloController {
+    @GetMapping("/api/hello")
+    public String sayHello() {
+        return "Hola desde el backend";
+    }
+}

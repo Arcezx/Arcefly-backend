@@ -1,0 +1,32 @@
+package com.example.prueba;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.Optional;
+
+@Service
+public class AuthService {
+    @Autowired
+    private UserRepository userRepository;
+
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @PostMapping("/authenticate")
+    public boolean authenticate(String username, String password) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return passwordEncoder.matches(password, user.getPassword()); // Compara la contraseña con la almacenada
+        }
+        return false;
+    }
+
+    // Este método se usa para guardar usuarios con contraseñas cifradas
+    public void registerUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Cifra la contraseña
+        userRepository.save(user);
+    }
+}

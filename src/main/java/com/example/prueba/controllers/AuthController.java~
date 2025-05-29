@@ -1,0 +1,42 @@
+package com.example.prueba.controllers;
+
+import com.example.prueba.repositories.UsuarioRepository;
+import com.example.prueba.services.AuthService;
+import com.example.prueba.models.Usuario;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private AuthService authService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Usuario loginUser) {
+        if (authService.authenticate(loginUser.getEmail(), loginUser.getPassword())) {
+            String token = "generar-token-jwt-aqui";
+            return ResponseEntity.ok(Map.of(
+                    "success", true,  // boolean en lugar de String
+                    "token", token,
+                    "message", "Login exitoso",
+                    "user", authService.getUserDetails(loginUser.getEmail()) // Opcional: datos del usuario
+            ));
+        }
+        return ResponseEntity.status(401).body(Map.of(
+                "success", false,  // boolean en lugar de String
+                "message", "Credenciales incorrectas"
+        ));
+    }
+
+
+
+}
+

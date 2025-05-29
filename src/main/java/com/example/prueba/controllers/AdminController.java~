@@ -1,0 +1,75 @@
+package com.example.prueba.controllers;
+
+import com.example.prueba.dtos.responses.AdminResponse;
+import com.example.prueba.models.Usuario;
+import com.example.prueba.repositories.UsuarioRepository;
+import com.example.prueba.services.AdminService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/admin")
+public class AdminController {
+
+    private final AdminService adminService;
+    private final UsuarioRepository usuarioRepository;
+    public AdminController(AdminService adminService, UsuarioRepository usuarioRepository) {
+        this.adminService = adminService;
+        this.usuarioRepository = usuarioRepository;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AdminResponse>> getAllAdmins() {
+        List<AdminResponse> admins = adminService.getAllAdmins();
+        return ResponseEntity.ok(admins);
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Object>> getAdminStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("adminsGestionados", adminService.getTotalAdminsCount());
+        stats.put("viajesCreados", adminService.getTripsCreatedThisMonth());
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/detailed")
+    public ResponseEntity<List<Map<String, Object>>> getAdminsDetailed() {
+        List<Map<String, Object>> admins = adminService.getAdminsWithDetailedInfo();
+        return ResponseEntity.ok(admins);
+    }
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentAdmin(@AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+            }
+
+            String email = userDetails.getUsername();
+            Usuario admin = usuarioRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Admin no encontrado"));
+
+            // Crear DTO de respuesta
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", admin.getIdUsuario());
+            response.put("nombre", admin.getNombre());
+            response.put("email", admin.getEmail());
+            response.put("tipo_usuario", admin.getTipoUsuario());
+            response.put("last_login", admin.getLastLogin());
+            response.put("estado", admin.getEstado());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al obtener admin actual: " + e.getMessage());
+        }
+    }
+}

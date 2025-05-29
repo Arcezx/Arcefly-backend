@@ -1,0 +1,12 @@
+package com.example.prueba.dtos.requests;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class IncidenteRequest {
+    private String area;
+    private String descripcion;
+    private String email;
+}

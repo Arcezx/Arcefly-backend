@@ -1,0 +1,16 @@
+package com.example.prueba.repositories;
+
+
+import com.example.prueba.models.Viaje;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public interface ViajeRepository extends JpaRepository<Viaje, Long> {
+    List<Viaje> findByEstado(String estado);
+    @Query("SELECT COUNT(v) FROM Viaje v WHERE v.fechaSalida BETWEEN :start AND :end")
+    int countViajesBetweenDates(@Param("start") LocalDate start, @Param("end") LocalDate end);
+}
