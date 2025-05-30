@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping("/api/clientes")
 @CrossOrigin(origins = "*")
 public class ClienteController {
 
