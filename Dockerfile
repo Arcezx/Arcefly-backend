@@ -23,7 +23,6 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # Exponer puerto dinámico (Render usará $PORT)
-ENV PORT 8080
 EXPOSE 8080
 
 # Comando de arranque
