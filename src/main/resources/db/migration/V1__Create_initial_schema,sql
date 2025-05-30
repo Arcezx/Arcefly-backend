@@ -1,0 +1,45 @@
+-- Tabla usuarios
+CREATE TABLE usuarios (
+    id_usuario BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    tipo_usuario VARCHAR(255),
+    password_plain VARCHAR(255),
+    estado VARCHAR(255),
+    last_login TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla viajes
+CREATE TABLE viajes (
+    id_viaje BIGSERIAL PRIMARY KEY,
+    id_usuario BIGINT NOT NULL,
+    origen VARCHAR(100) NOT NULL,
+    destino VARCHAR(100) NOT NULL,
+    f_salida DATE NOT NULL,
+    f_regreso DATE,
+    direccion VARCHAR(50) NOT NULL,
+    clase VARCHAR(20) NOT NULL,
+    tipo VARCHAR(30) NOT NULL,
+    capacidad INTEGER NOT NULL,
+    estado VARCHAR(20) NOT NULL,
+    CONSTRAINT fk_viajes_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+-- Tabla reservas
+CREATE TABLE reservas (
+    id_reserva BIGSERIAL PRIMARY KEY,
+    id_viaje BIGINT NOT NULL,
+    id_usuario BIGINT NOT NULL,
+    f_reserva DATE NOT NULL,
+    asiento VARCHAR(10) NOT NULL,
+    estado VARCHAR(20) NOT NULL,
+    CONSTRAINT fk_reservas_viaje FOREIGN KEY (id_viaje) REFERENCES viajes(id_viaje) ON DELETE CASCADE,
+    CONSTRAINT fk_reservas_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT unique_usuario_viaje UNIQUE (id_usuario, id_viaje)
+);
+
+-- Índices adicionales
+CREATE INDEX idx_reservas_viaje ON reservas(id_viaje);
+CREATE INDEX idx_viajes_usuario ON viajes(id_usuario);
