@@ -11,6 +11,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/incidentes")
+@CrossOrigin(origins = {"https://arcefly.netlify.app", "http://localhost:4200"},
+        allowedHeaders = "*",
+        methods = {RequestMethod.POST},
+        maxAge = 3600,
+        allowCredentials = "true")
 public class IncidenteController {
 
     private final EmailService emailService;
