@@ -87,6 +87,7 @@ public class ReservaController {
     }
 
     @PatchMapping("/{id}/confirmar")
+    @CrossOrigin(methods = {RequestMethod.PATCH, RequestMethod.OPTIONS})
     public ResponseEntity<ReservaResponse> confirmarReserva(@PathVariable Long id) {
         Reserva reservaConfirmada = reservaService.confirmarReserva(id);
         return ResponseEntity.ok(toResponse(reservaConfirmada));
