@@ -56,7 +56,6 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con ID: " + idReserva));
 
-        // Validar solo si el asiento ha cambiado
         if (!reserva.getAsiento().equals(request.asiento())) {
             if (!validarDisponibilidadAsiento(request.idViaje(), request.asiento())) {
                 throw new IllegalStateException("El asiento " + request.asiento() + " ya está ocupado");
@@ -64,7 +63,6 @@ public class ReservaService {
             reserva.setAsiento(request.asiento());
         }
 
-        // Validar solo si el viaje ha cambiado
         if (!reserva.getIdViaje().equals(request.idViaje())) {
             if (validarReservaExistente(reserva.getIdUsuario(), request.idViaje())) {
                 throw new IllegalStateException("El usuario ya tiene una reserva para este viaje");
@@ -113,18 +111,15 @@ public class ReservaService {
 
     @Transactional
     public Reserva crearReservaConValidacion(CreateReservaRequest request) {
-        // Validar que existan las entidades relacionadas
         viajeRepository.findById(request.idViaje())
                 .orElseThrow(() -> new EntityNotFoundException("Viaje no encontrado"));
         usuarioRepository.findById(request.idUsuario())
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
-        // Validar disponibilidad de asiento
         if (!validarDisponibilidadAsiento(request.idViaje(), request.asiento())) {
             throw new IllegalStateException("El asiento " + request.asiento() + " ya está ocupado");
         }
 
-        // Validar que el usuario no tenga ya una reserva para este viaje
         if (validarReservaExistente(request.idUsuario(), request.idViaje())) {
             throw new IllegalStateException("El usuario ya tiene una reserva para este viaje");
         }

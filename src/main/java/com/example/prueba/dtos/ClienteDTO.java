@@ -4,7 +4,7 @@ public record ClienteDTO(
         Long id,
         String nombre,
         String email,
-        String password,  // Añadir campo password
+        String password,
         String tipo,
         String estado
 ) {}

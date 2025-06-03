@@ -16,8 +16,8 @@ public class ViajeResponse {
     private String tipo;
     private Integer capacidad;
     private String estado;
-    private boolean esSoloIda; // Campo calculado
+    private boolean esSoloIda;
 
-    // Opcional: Si quieres mostrar el nombre del usuario
+
     private String nombreUsuario;
 }

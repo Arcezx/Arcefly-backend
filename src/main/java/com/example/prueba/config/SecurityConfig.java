@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Permite todas las solicitudes sin autenticación
+                        .anyRequest().permitAll()
                 );
 
         return http.build();

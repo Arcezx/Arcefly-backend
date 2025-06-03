@@ -29,7 +29,7 @@ public class Usuario {
     private String tipoUsuario;
 
     @Column(name = "estado")
-    private String estado = "ACTIVO"; // Nuevo campo con valor por defecto
+    private String estado = "ACTIVO";
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 

@@ -34,12 +34,10 @@ public class ClienteService {
         usuario.setTipoUsuario(request.tipo());
         usuario.setEstado(request.estado() != null ? request.estado() : "ACTIVO");
 
-        // Solo hashear la contraseña si se proporciona
         if (request.password() != null && !request.password().isEmpty()) {
             usuario.setPassword(passwordEncoder.encode(request.password()));
             usuario.setPasswordPlain(request.password());
         } else {
-            // Generar una contraseña temporal si no se proporciona
             String tempPassword = "temp" + UUID.randomUUID().toString().substring(0, 8);
             usuario.setPassword(passwordEncoder.encode(tempPassword));
             usuario.setPasswordPlain(tempPassword);
@@ -65,7 +63,6 @@ public class ClienteService {
         usuario.setTipoUsuario(dto.tipo());
         usuario.setEstado(dto.estado());
 
-        // Actualizar contraseña solo si se proporciona una nueva
         if (dto.password() != null && !dto.password().isEmpty()) {
             usuario.setPassword(passwordEncoder.encode(dto.password()));
             usuario.setPasswordPlain(dto.password());

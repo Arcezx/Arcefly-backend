@@ -14,7 +14,7 @@ public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reserva")
-    private Long idReserva;  // Cambiado de Integer a Long
+    private Long idReserva;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_viaje", insertable = false, updatable = false)
@@ -25,10 +25,10 @@ public class Reserva {
     private Usuario usuario;
 
     @Column(name = "id_viaje", nullable = false)
-    private Long idViaje;  // Cambiado de Integer a Long
+    private Long idViaje;
 
     @Column(name = "id_usuario", nullable = false)
-    private Long idUsuario;  // Cambiado de Integer a Long
+    private Long idUsuario;
 
     @Column(name = "f_reserva", nullable = false)
     private LocalDate fechaReserva;

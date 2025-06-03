@@ -44,7 +44,6 @@ public class AuthService {
                 return response;
             }
 
-            // Actualizar último login y estado
             user.setLastLogin(LocalDateTime.now());
             user.setEstado("ACTIVO");
             usuarioRepository.save(user);
@@ -55,8 +54,8 @@ public class AuthService {
                     "nombre", user.getNombre(),
                     "email", user.getEmail(),
                     "tipoUsuario", user.getTipoUsuario(),
-                    "last_login", user.getLastLogin(), // Añadir esto
-                    "estado", user.getEstado() // Añadir esto
+                    "last_login", user.getLastLogin(),
+                    "estado", user.getEstado()
             ));
         } catch (Exception e) {
             response.put("success", false);

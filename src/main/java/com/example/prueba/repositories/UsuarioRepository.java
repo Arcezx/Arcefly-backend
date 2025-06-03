@@ -25,10 +25,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query("SELECT COUNT(u) FROM Usuario u WHERE u.tipoUsuario = :tipoUsuario")
     long countByTipoUsuario(String tipoUsuario);
 
-    // Nuevo método para obtener usuarios con todos los campos necesarios
+
     @Query("SELECT u FROM Usuario u WHERE u.tipoUsuario = 'ADMIN'")
     List<Usuario> findAllAdminsWithDetails();
 
     long countByTipoUsuarioAndEstado(String tipoUsuario, String estado);
+    Optional<Usuario> findByEmailAndPassword(String email, String password);
 
 }

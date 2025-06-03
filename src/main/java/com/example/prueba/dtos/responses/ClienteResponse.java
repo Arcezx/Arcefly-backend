@@ -6,6 +6,6 @@ public record ClienteResponse(
         String email,
         String password,
         String tipo,
-        String estado, // Nuevo campo
+        String estado,
         LocalDateTime fechaCreacion
 ) {}
