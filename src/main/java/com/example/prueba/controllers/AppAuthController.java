@@ -7,6 +7,7 @@ import com.example.prueba.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -18,6 +19,7 @@ public class AppAuthController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -30,7 +32,7 @@ public class AppAuthController {
 
         Usuario usuario = optionalUsuario.get();
 
-        if (!usuario.getPassword().equals(loginRequest.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Collections.singletonMap("message", "Correo o contraseña incorrectos"));
         }
@@ -38,4 +40,5 @@ public class AppAuthController {
         LoginResponse response = new LoginResponse(usuario);
         return ResponseEntity.ok(response);
     }
+
 }
