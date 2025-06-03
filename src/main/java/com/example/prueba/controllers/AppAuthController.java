@@ -19,7 +19,12 @@ public class AppAuthController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-    private PasswordEncoder passwordEncoder;
+
+
+    public AppAuthController(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
