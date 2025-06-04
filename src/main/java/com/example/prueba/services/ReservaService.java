@@ -2,6 +2,7 @@ package com.example.prueba.services;
 
 import com.example.prueba.dtos.requests.CreateReservaRequest;
 import com.example.prueba.dtos.requests.UpdateReservaRequest;
+import com.example.prueba.dtos.responses.ReservaResponse;
 import com.example.prueba.models.Reserva;
 import com.example.prueba.repositories.ReservaRepository;
 import com.example.prueba.repositories.UsuarioRepository;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservaService {
@@ -126,4 +128,7 @@ public class ReservaService {
 
         return crearReserva(request);
     }
+
+    // APP
+
 }

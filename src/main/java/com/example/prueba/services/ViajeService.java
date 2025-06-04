@@ -1,6 +1,7 @@
 package com.example.prueba.services;
 
 import com.example.prueba.dtos.requests.CreateViajeRequest;
+import com.example.prueba.dtos.responses.ViajeDropdownResponse;
 import com.example.prueba.dtos.responses.ViajeResponse;
 import com.example.prueba.models.Viaje;
 import com.example.prueba.repositories.ViajeRepository;
@@ -9,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,4 +117,10 @@ public class ViajeService {
                 .map(this::convertirAViajeResponse)
                 .collect(Collectors.toList());
     }
+
+    // APP
+
+
+
+
 }

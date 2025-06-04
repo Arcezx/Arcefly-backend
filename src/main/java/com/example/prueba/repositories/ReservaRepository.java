@@ -31,4 +31,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     boolean existsByIdViajeAndIdUsuario(@Param("idViaje") Long idViaje,
                                         @Param("idUsuario") Long idUsuario);
 
+
+    @Query("SELECT r.viaje.id FROM Reserva r WHERE r.usuario.idUsuario = :idUsuario")
+    List<Long> findIdsViajesReservadosPorUsuario(@Param("idUsuario") Long idUsuario);
+
 }

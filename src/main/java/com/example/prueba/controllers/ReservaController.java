@@ -144,4 +144,9 @@ public class ReservaController {
     private List<ReservaResponse> toResponseList(List<Reserva> reservas) {
         return reservas.stream().map(this::toResponse).collect(Collectors.toList());
     }
+
+
+    // -------------------APP------------------
+
+
 }
