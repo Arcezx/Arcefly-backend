@@ -130,5 +130,8 @@ public class ReservaService {
     }
 
     // APP
-
+    public Reserva obtenerReservaActualDeUsuario(Long idUsuario) {
+        return reservaRepository.findReservaActualByUsuario(idUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró una reserva actual"));
+    }
 }

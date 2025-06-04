@@ -148,5 +148,9 @@ public class ReservaController {
 
     // -------------------APP------------------
 
-
+    @GetMapping("/usuario/actual")
+    public ResponseEntity<?> obtenerReservaActual(@RequestParam Long idUsuario) {
+        Reserva reserva = reservaService.obtenerReservaActualDeUsuario(idUsuario);
+        return ResponseEntity.ok(toResponse(reserva));
+    }
 }
