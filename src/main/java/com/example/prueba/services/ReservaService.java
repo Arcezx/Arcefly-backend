@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,8 +131,7 @@ public class ReservaService {
     }
 
     // APP
-    public Reserva obtenerReservaActualDeUsuario(Long idUsuario) {
-        return reservaRepository.findReservaActualByUsuario(idUsuario)
-                .orElseThrow(() -> new EntityNotFoundException("No se encontró una reserva actual"));
+    public Optional<Reserva> obtenerReservaActualDeUsuario(Long idUsuario) {
+        return reservaRepository.findReservaActualByUsuario(idUsuario);
     }
 }

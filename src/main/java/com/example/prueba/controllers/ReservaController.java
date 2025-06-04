@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -149,8 +150,18 @@ public class ReservaController {
     // -------------------APP------------------
 
     @GetMapping("/usuario/actual")
-    public ResponseEntity<Reserva> obtenerReservaActual(@RequestParam Long idUsuario) {
-        return ResponseEntity.ok(reservaService.obtenerReservaActualDeUsuario(idUsuario));
+    public ResponseEntity<?> obtenerReservaActual(@RequestParam Long idUsuario) {
+
+        if (idUsuario == null || idUsuario <= 0) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message","idUsuario inválido"));
+        }
+
+        return reservaService.obtenerReservaActualDeUsuario(idUsuario)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
+
+
 
 }
