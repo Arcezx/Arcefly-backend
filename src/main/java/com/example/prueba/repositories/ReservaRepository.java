@@ -36,6 +36,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Long> findIdsViajesReservadosPorUsuario(@Param("idUsuario") Long idUsuario);
 
 
-    @Query("SELECT r FROM Reserva r WHERE r.idUsuario = :idUsuario AND r.estado = 'ACTIVO'")
     Optional<Reserva> findReservaActualByUsuario(@Param("idUsuario") Long idUsuario);
+
 }
