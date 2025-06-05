@@ -40,7 +40,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "https://arcefly.netlify.app",
                 "http://localhost:4200",
-                "http://localhost:8101"
+                "http://localhost:8101",
+                "http://localhost:8100"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
