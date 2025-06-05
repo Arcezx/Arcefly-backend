@@ -4,6 +4,7 @@ import com.example.prueba.dtos.requests.CreateViajeRequest;
 import com.example.prueba.dtos.responses.ViajeDropdownResponse;
 import com.example.prueba.dtos.responses.ViajeResponse;
 import com.example.prueba.models.Viaje;
+import com.example.prueba.repositories.ReservaRepository;
 import com.example.prueba.repositories.ViajeRepository;
 import com.example.prueba.repositories.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,10 +22,13 @@ public class ViajeService {
 
     private final ViajeRepository viajeRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ReservaRepository reservaRepository;
 
-    public ViajeService(ViajeRepository viajeRepository, UsuarioRepository usuarioRepository) {
+
+    public ViajeService(ViajeRepository viajeRepository, UsuarioRepository usuarioRepository, ReservaRepository reservaRepository) {
         this.viajeRepository = viajeRepository;
         this.usuarioRepository = usuarioRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     @Transactional
@@ -120,7 +125,25 @@ public class ViajeService {
 
     // APP
 
+    public List<Viaje> buscarVuelosExactos(String origen, String destino, String fechaInicio, String fechaFin, Long idUsuario) {
+        List<Viaje> vuelos = viajeRepository.findByOrigenAndDestinoAndFechas(origen, destino, fechaInicio, fechaFin);
+        List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
 
+        return vuelos.stream()
+                .filter(v -> !idsReservados.contains(v.getId()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Viaje> buscarVuelosAlternativos(String origen, String destino, Long idUsuario) {
+        List<Viaje> vuelos = viajeRepository.findByOrigenAndDestino(origen, destino);
+        List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
+
+        return vuelos.stream()
+                .filter(v -> !idsReservados.contains(v.getId()))
+                .sorted(Comparator.comparing(Viaje::getFechaSalida))
+                .limit(5)
+                .collect(Collectors.toList());
+    }
 
 
 }
