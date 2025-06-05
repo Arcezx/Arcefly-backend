@@ -100,35 +100,6 @@ public class ViajeController {
     }
 
     @GetMapping("/busqueda-completa")
-    public ResponseEntity<?> buscarVuelosExactos(
-            @RequestParam String origen,
-            @RequestParam String destino,
-            @RequestParam String fechaInicio,
-            @RequestParam String fechaFin,
-            @RequestParam Long idUsuario) {
-
-        List<Viaje> vuelos = viajeService.buscarVuelosExactos(origen, destino, fechaInicio, fechaFin, idUsuario);
-
-        if (!vuelos.isEmpty()) {
-            return ResponseEntity.ok(Map.of(
-                    "tipo", "exactos",
-                    "vuelos", vuelos
-            ));
-        }
-
-        // 2. Si no hay coincidencias exactas, buscar alternativas
-        List<Viaje> alternativos = viajeService.buscarVuelosAlternativos(origen, destino, idUsuario);
-
-        return ResponseEntity.ok(Map.of(
-                "tipo", alternativos.isEmpty() ? "ninguno" : "alternativos",
-                "vuelos", alternativos,
-                "mensaje", alternativos.isEmpty()
-                        ? "No hay vuelos disponibles para estas fechas"
-                        : "No hay vuelos para las fechas seleccionadas, pero te mostramos otras opciones"
-        ));
-    }
-
-    @GetMapping("/busqueda-completa")
     public ResponseEntity<?> buscarVuelosCompletos(
             @RequestParam String origen,
             @RequestParam String destino,
