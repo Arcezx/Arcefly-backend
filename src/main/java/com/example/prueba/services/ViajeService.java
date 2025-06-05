@@ -125,14 +125,17 @@ public class ViajeService {
 
     // APP
 
-    public List<Viaje> buscarVuelosExactos(String origen, String destino, String fechaInicio, String fechaFin, Long idUsuario) {
-        List<Viaje> vuelos = viajeRepository.findByOrigenAndDestinoAndFechas(origen, destino, fechaInicio, fechaFin);
+    public List<Viaje> buscarVuelosExactos(String origen, String destino,
+                                           String fechaInicio, String fechaFin,
+                                           Long idUsuario) {
+        List<Viaje> vuelos = viajeRepository.buscarPorOrigenDestinoYRangoFechas(origen, destino, fechaInicio, fechaFin);
         List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
 
         return vuelos.stream()
                 .filter(v -> !idsReservados.contains(v.getId()))
                 .collect(Collectors.toList());
     }
+
 
     public List<Viaje> buscarVuelosAlternativos(String origen, String destino, Long idUsuario) {
         List<Viaje> vuelos = viajeRepository.findByOrigenAndDestino(origen, destino);
@@ -143,6 +146,15 @@ public class ViajeService {
                 .sorted(Comparator.comparing(Viaje::getFechaSalida))
                 .limit(5)
                 .collect(Collectors.toList());
+    }
+
+    public List<Viaje> findByOrigenAndDestinoAndFechas(String origen, String destino,
+                                                       String fechaInicio, String fechaFin) {
+        return viajeRepository.buscarPorOrigenDestinoYRangoFechas(origen, destino, fechaInicio, fechaFin);
+    }
+
+    public List<Viaje> findByOrigenAndDestino(String origen, String destino) {
+        return viajeRepository.findByOrigenAndDestino(origen, destino);
     }
 
 

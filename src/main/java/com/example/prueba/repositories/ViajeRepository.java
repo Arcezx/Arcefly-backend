@@ -41,4 +41,6 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
     List<Viaje> findByOrigenAndDestino(
             @Param("origen") String origen,
             @Param("destino") String destino);
+
+
 }

@@ -15,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -128,6 +125,45 @@ public class ViajeController {
                 "mensaje", alternativos.isEmpty()
                         ? "No hay vuelos disponibles para estas fechas"
                         : "No hay vuelos para las fechas seleccionadas, pero te mostramos otras opciones"
+        ));
+    }
+
+    @GetMapping("/busqueda-completa")
+    public ResponseEntity<?> buscarVuelosCompletos(
+            @RequestParam String origen,
+            @RequestParam String destino,
+            @RequestParam String fechaInicio,
+            @RequestParam String fechaFin,
+            @RequestParam Long idUsuario) {
+
+        List<Viaje> vuelosExactos = viajeService.findByOrigenAndDestinoAndFechas(origen, destino, fechaInicio, fechaFin);
+        List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
+
+        List<Viaje> disponibles = vuelosExactos.stream()
+                .filter(v -> !idsReservados.contains(v.getId()))
+                .collect(Collectors.toList());
+
+        if (!disponibles.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "tipo", "exactos",
+                    "vuelos", disponibles
+            ));
+        }
+
+        // 2. Búsqueda alternativa (solo origen + destino)
+        List<Viaje> alternativos = viajeService.findByOrigenAndDestino(origen, destino)
+                .stream()
+                .filter(v -> !idsReservados.contains(v.getId()))
+                .sorted(Comparator.comparing(Viaje::getFechaSalida))
+                .limit(5)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of(
+                "tipo", alternativos.isEmpty() ? "ninguno" : "alternativos",
+                "vuelos", alternativos,
+                "mensaje", alternativos.isEmpty()
+                        ? "No hay vuelos disponibles para estos criterios"
+                        : "No encontramos vuelos para esas fechas, pero tenemos otras opciones"
         ));
     }
 }
