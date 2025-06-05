@@ -98,6 +98,7 @@ public class ViajeController {
                 .filter(v -> !idsReservados.contains(v.getId()))
                 .collect(Collectors.toList());
     }
+    //
 
     @GetMapping("/busqueda-completa")
     public ResponseEntity<?> buscarVuelosCompletos(
