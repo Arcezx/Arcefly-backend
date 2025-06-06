@@ -126,7 +126,7 @@ public class ViajeService {
     // APP
 
     public List<Viaje> buscarVuelosExactos(String origen, String destino,
-                                           String fechaInicio, String fechaFin,
+                                           LocalDate fechaInicio, LocalDate fechaFin,
                                            Long idUsuario) {
         List<Viaje> vuelos = viajeRepository.buscarPorOrigenDestinoYRangoFechas(origen, destino, fechaInicio, fechaFin);
         List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
@@ -149,10 +149,9 @@ public class ViajeService {
     }
 
     public List<Viaje> findByOrigenAndDestinoAndFechas(String origen, String destino,
-                                                       String fechaInicio, String fechaFin) {
+                                                       LocalDate fechaInicio, LocalDate fechaFin) {
         return viajeRepository.buscarPorOrigenDestinoYRangoFechas(origen, destino, fechaInicio, fechaFin);
     }
-
     public List<Viaje> findByOrigenAndDestino(String origen, String destino) {
         return viajeRepository.findByOrigenAndDestino(origen, destino);
     }

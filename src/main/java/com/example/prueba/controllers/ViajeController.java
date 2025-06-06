@@ -141,8 +141,8 @@ public class ViajeController {
                     viajeService.findByOrigenAndDestinoAndFechas(
                             origen,
                             destino,
-                            fechaInicioDate.toString(),
-                            fechaFinDate.toString()
+                            fechaInicioDate,
+                            fechaFinDate
                     )
             ).orElse(new ArrayList<>());
 
