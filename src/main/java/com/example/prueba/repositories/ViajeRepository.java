@@ -21,17 +21,19 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
                                                    @Param("fechaInicio") String fechaInicio,
                                                    @Param("fechaFin") String fechaFin);
 
-    @Query("SELECT v FROM Viaje v WHERE " +
-            "LOWER(v.origen) = LOWER(:origen) AND " +
-            "LOWER(v.destino) = LOWER(:destino) AND " +
-            "v.fechaSalida BETWEEN :fechaInicio AND :fechaFin AND " +
-            "v.estado = 'ACTIVO' " +
-            "ORDER BY v.fechaSalida ASC")
-    List<Viaje> findByOrigenAndDestinoAndFechas(
-            @Param("origen") String origen,
-            @Param("destino") String destino,
-            @Param("fechaInicio") String fechaInicio,
-            @Param("fechaFin") String fechaFin);
+    @Query("""
+       SELECT v
+       FROM Viaje v
+       WHERE LOWER(v.origen)  = LOWER(:origen)
+         AND LOWER(v.destino) = LOWER(:destino)
+         AND v.fechaSalida BETWEEN :fechaInicio AND :fechaFin
+         AND v.estado = 'ACTIVO'
+       ORDER BY v.fechaSalida
+       """)
+    List<Viaje> findByOrigenAndDestinoAndFechas(@Param("origen")      String     origen,
+                                                @Param("destino")     String     destino,
+                                                @Param("fechaInicio") LocalDate  fechaInicio,
+                                                @Param("fechaFin")    LocalDate  fechaFin);
 
     // Búsqueda por origen y destino (sin fechas)
     @Query("SELECT v FROM Viaje v WHERE " +

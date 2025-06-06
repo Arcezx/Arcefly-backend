@@ -83,21 +83,24 @@ public class ViajeController {
     }
 
     //APP
-    @GetMapping("/api/viajes/busqueda")
+    @GetMapping("/busqueda")
     public List<Viaje> buscarViajesEntreFechas(
-            @RequestParam String origen,
-            @RequestParam String destino,
-            @RequestParam String fechaInicio,
-            @RequestParam String fechaFin,
-            @RequestParam Long idUsuario
-    ) {
-        List<Viaje> resultados = viajeRepository.buscarPorOrigenDestinoYRangoFechas(origen, destino, fechaInicio, fechaFin);
+            @RequestParam String     origen,
+            @RequestParam String     destino,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+            @RequestParam Long       idUsuario) {
+
+        List<Viaje> brutos = viajeRepository
+                .findByOrigenAndDestinoAndFechas(origen, destino, fechaInicio, fechaFin);
+
         List<Long> idsReservados = reservaRepository.findIdsViajesReservadosPorUsuario(idUsuario);
 
-        return resultados.stream()
+        return brutos.stream()
                 .filter(v -> !idsReservados.contains(v.getId()))
-                .collect(Collectors.toList());
+                .toList();
     }
+
     //
 
     @GetMapping("/busqueda-completa")
