@@ -156,8 +156,9 @@ public class ViajeService {
         return viajeRepository.findByOrigenAndDestino(origen, destino);
     }
 
+    // ViajeService.java  (al final)
     public List<Viaje> buscarSoloPorDestino(String destino) {
-        return viajeRepository.findByDestino(destino);
+        return viajeRepository.findByDestino(destino.trim().toLowerCase());
     }
 
 }
