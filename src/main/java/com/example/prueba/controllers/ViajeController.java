@@ -204,16 +204,20 @@ public class ViajeController {
             @RequestParam String destino,
             @RequestParam Long idUsuario) {
 
-        // Traemos todos los vuelos que llegan a «destino»
-        List<Viaje> vuelos = viajeService.buscarSoloPorDestino(destino);
+        System.out.println("🔍 Buscando vuelos a destino: " + destino);
+        System.out.println("👤 ID Usuario: " + idUsuario);
 
-        // Excluimos los que ya reservó el usuario
+        List<Viaje> vuelos = viajeService.buscarSoloPorDestino(destino);
+        System.out.println("✈️ Vuelos encontrados (crudos): " + vuelos.size());
+
         List<Long> reservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
+        System.out.println("📌 IDs de viajes reservados: " + reservados);
 
         vuelos = vuelos.stream()
                 .filter(v -> !reservados.contains(v.getId()))
                 .collect(Collectors.toList());
 
+        System.out.println("✅ Vuelos disponibles: " + vuelos.size());
         return ResponseEntity.ok(vuelos);
     }
 
