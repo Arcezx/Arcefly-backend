@@ -137,15 +137,19 @@ public class ViajeController {
             }
 
             // 4. Búsqueda exacta (origen + destino + fechas)
-            List<Viaje> vuelosExactos = viajeService.findByOrigenAndDestinoAndFechas(
-                    origen,
-                    destino,
-                    fechaInicioDate.toString(),
-                    fechaFinDate.toString()
-            );
+            List<Viaje> vuelosExactos = Optional.ofNullable(
+                    viajeService.findByOrigenAndDestinoAndFechas(
+                            origen,
+                            destino,
+                            fechaInicioDate.toString(),
+                            fechaFinDate.toString()
+                    )
+            ).orElse(new ArrayList<>());
 
             // 5. Filtrar viajes ya reservados por el usuario
-            List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
+            List<Long> idsReservados = Optional.ofNullable(
+                    reservaRepository.findViajesReservadosPorUsuario(idUsuario)
+            ).orElse(new ArrayList<>());
 
             List<Viaje> disponibles = vuelosExactos.stream()
                     .filter(v -> !idsReservados.contains(v.getId()))
@@ -178,11 +182,20 @@ public class ViajeController {
             ));
 
         } catch (Exception e) {
-            // 9. Manejo de errores inesperados
+            // 9. Manejo de errores inesperados con log
+            System.out.println("❌ ERROR inesperado en /busqueda-completa:");
+            System.out.println("Origen: " + origen);
+            System.out.println("Destino: " + destino);
+            System.out.println("FechaInicio: " + fechaInicio);
+            System.out.println("FechaFin: " + fechaFin);
+            System.out.println("ID Usuario: " + idUsuario);
+            e.printStackTrace(); // ✅ Log completo en Render
+
             return ResponseEntity.internalServerError().body(Map.of(
                     "error", "Error al procesar la búsqueda",
                     "detalle", e.getMessage()
             ));
         }
     }
+
 }
