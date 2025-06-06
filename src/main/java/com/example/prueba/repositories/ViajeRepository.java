@@ -54,5 +54,12 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
             @Param("origen") String origen,
             @Param("destino") String destino);
 
+    @Query("""
+       SELECT v FROM Viaje v
+       WHERE LOWER(v.destino) = LOWER(:destino)
+       AND   v.estado = 'ACTIVO'
+       ORDER BY v.fechaSalida
+       """)
+    List<Viaje> findByDestino(@Param("destino") String destino);
 
 }

@@ -198,4 +198,24 @@ public class ViajeController {
         }
     }
 
+    // -------------- NUEVO ---------------
+    @GetMapping("/por-destino")
+    public ResponseEntity<List<Viaje>> buscarSoloPorDestino(
+            @RequestParam String destino,
+            @RequestParam Long idUsuario) {
+
+        // Traemos todos los vuelos que llegan a «destino»
+        List<Viaje> vuelos = viajeService.buscarSoloPorDestino(destino);
+
+        // Excluimos los que ya reservó el usuario
+        List<Long> reservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
+
+        vuelos = vuelos.stream()
+                .filter(v -> !reservados.contains(v.getId()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(vuelos);
+    }
+
+
 }
