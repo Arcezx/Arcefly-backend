@@ -108,34 +108,78 @@ public class ViajeController {
             @RequestParam String fechaFin,
             @RequestParam Long idUsuario) {
 
-        List<Viaje> vuelosExactos = viajeService.findByOrigenAndDestinoAndFechas(origen, destino, fechaInicio, fechaFin);
-        List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
+        try {
+            // 1. Validación de parámetros
+            if (origen == null || origen.isBlank() || destino == null || destino.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "Origen y destino son requeridos"
+                ));
+            }
 
-        List<Viaje> disponibles = vuelosExactos.stream()
-                .filter(v -> !idsReservados.contains(v.getId()))
-                .collect(Collectors.toList());
+            // 2. Normalización de parámetros
+            origen = origen.trim().toLowerCase();
+            destino = destino.trim().toLowerCase();
 
-        if (!disponibles.isEmpty()) {
+            // 3. Parseo de fechas con formato ISO (YYYY-MM-DD)
+            LocalDate fechaInicioDate;
+            LocalDate fechaFinDate;
+
+            try {
+                fechaInicioDate = LocalDate.parse(fechaInicio.split("T")[0]);
+                fechaFinDate = LocalDate.parse(fechaFin.split("T")[0]);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "Formato de fecha inválido. Use YYYY-MM-DD"
+                ));
+            }
+
+            // 4. Búsqueda exacta (origen + destino + fechas)
+            List<Viaje> vuelosExactos = viajeService.findByOrigenAndDestinoAndFechas(
+                    origen,
+                    destino,
+                    fechaInicioDate.toString(),
+                    fechaFinDate.toString()
+            );
+
+            // 5. Filtrar viajes ya reservados por el usuario
+            List<Long> idsReservados = reservaRepository.findViajesReservadosPorUsuario(idUsuario);
+
+            List<Viaje> disponibles = vuelosExactos.stream()
+                    .filter(v -> !idsReservados.contains(v.getId()))
+                    .collect(Collectors.toList());
+
+            // 6. Si hay resultados exactos, retornarlos
+            if (!disponibles.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                        "tipo", "exactos",
+                        "vuelos", disponibles,
+                        "mensaje", String.format("%d vuelos encontrados", disponibles.size())
+                ));
+            }
+
+            // 7. Búsqueda alternativa (solo origen + destino)
+            List<Viaje> alternativos = viajeService.findByOrigenAndDestino(origen, destino)
+                    .stream()
+                    .filter(v -> !idsReservados.contains(v.getId()))
+                    .sorted(Comparator.comparing(Viaje::getFechaSalida))
+                    .limit(5)
+                    .collect(Collectors.toList());
+
+            // 8. Retornar resultados alternativos o mensaje de no encontrados
             return ResponseEntity.ok(Map.of(
-                    "tipo", "exactos",
-                    "vuelos", disponibles
+                    "tipo", alternativos.isEmpty() ? "ninguno" : "alternativos",
+                    "vuelos", alternativos,
+                    "mensaje", alternativos.isEmpty()
+                            ? "No hay vuelos disponibles para estos criterios"
+                            : "No encontramos vuelos para esas fechas, pero tenemos otras opciones"
+            ));
+
+        } catch (Exception e) {
+            // 9. Manejo de errores inesperados
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "error", "Error al procesar la búsqueda",
+                    "detalle", e.getMessage()
             ));
         }
-
-        // 2. Búsqueda alternativa (solo origen + destino)
-        List<Viaje> alternativos = viajeService.findByOrigenAndDestino(origen, destino)
-                .stream()
-                .filter(v -> !idsReservados.contains(v.getId()))
-                .sorted(Comparator.comparing(Viaje::getFechaSalida))
-                .limit(5)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(Map.of(
-                "tipo", alternativos.isEmpty() ? "ninguno" : "alternativos",
-                "vuelos", alternativos,
-                "mensaje", alternativos.isEmpty()
-                        ? "No hay vuelos disponibles para estos criterios"
-                        : "No encontramos vuelos para esas fechas, pero tenemos otras opciones"
-        ));
     }
 }

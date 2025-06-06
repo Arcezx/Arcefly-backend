@@ -163,5 +163,23 @@ public class ReservaController {
     }
 
 
+    @PostMapping("/app/crear")
+    public ResponseEntity<?> crearReservaApp(
+            @RequestParam Long idViaje,
+            @RequestParam Long idUsuario) {
 
+        try {
+            Reserva reserva = reservaService.crearReservaApp(idViaje, idUsuario);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Reserva creada. Verifica tu sección de reservas.",
+                    "data", toResponse(reserva)
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
+    }
 }

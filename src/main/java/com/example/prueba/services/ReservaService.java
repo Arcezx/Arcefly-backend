@@ -4,6 +4,8 @@ import com.example.prueba.dtos.requests.CreateReservaRequest;
 import com.example.prueba.dtos.requests.UpdateReservaRequest;
 import com.example.prueba.dtos.responses.ReservaResponse;
 import com.example.prueba.models.Reserva;
+import com.example.prueba.models.Usuario;
+import com.example.prueba.models.Viaje;
 import com.example.prueba.repositories.ReservaRepository;
 import com.example.prueba.repositories.UsuarioRepository;
 import com.example.prueba.repositories.ViajeRepository;
@@ -13,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,8 +134,54 @@ public class ReservaService {
         return crearReserva(request);
     }
 
-    // APP
+    // -------------------APP------------------
     public Optional<Reserva> obtenerReservaActualDeUsuario(Long idUsuario) {
         return reservaRepository.findReservaActualByUsuario(idUsuario);
+    }
+    @Transactional
+    public Reserva crearReservaApp(Long idViaje, Long idUsuario) {
+        // 1. Validar existencia
+        Viaje viaje = viajeRepository.findById(idViaje)
+                .orElseThrow(() -> new EntityNotFoundException("Viaje no encontrado"));
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        // 2. Validar reserva existente
+        if (reservaRepository.existsByIdUsuarioAndIdViaje(idUsuario, idViaje)) {
+            throw new IllegalStateException("Ya tienes una reserva para este viaje");
+        }
+
+        // 3. Generar asiento aleatorio disponible
+        String asiento = generarAsientoDisponible(idViaje);
+
+        // 4. Crear reserva
+        Reserva reserva = new Reserva();
+        reserva.setViaje(viaje);
+        reserva.setUsuario(usuario);
+        reserva.setAsiento(asiento);
+        reserva.setEstado("POR CONFIRMAR");
+        reserva.setFechaReserva(LocalDate.now());
+
+        return reservaRepository.save(reserva);
+    }
+
+    // Método auxiliar para asientos
+    private String generarAsientoDisponible(Long idViaje) {
+        Random random = new Random();
+        String asiento;
+        int intentos = 0;
+
+        do {
+            char fila = (char) ('A' + random.nextInt(6));
+            int numero = 1 + random.nextInt(20);
+            asiento = fila + String.valueOf(numero);
+            intentos++;
+
+            if (intentos > 100) {
+                throw new IllegalStateException("No hay asientos disponibles");
+            }
+        } while (!validarDisponibilidadAsiento(idViaje, asiento));
+
+        return asiento;
     }
 }
