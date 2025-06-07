@@ -46,5 +46,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     Optional<Reserva> findReservaActualByUsuario(@Param("idUsuario") Long idUsuario);
     @Query("SELECT r.viaje.id FROM Reserva r WHERE r.usuario.idUsuario= :idUsuario")
     List<Long> findViajesReservadosPorUsuario(@Param("idUsuario") Long idUsuario);
+    @Query("SELECT r.asiento FROM Reserva r WHERE r.idViaje = :idViaje")
+    List<String> findAsientosOcupados(@Param("idViaje") Long idViaje);
+    Optional<Reserva> findByIdViajeAndIdUsuario(Long idViaje, Long idUsuario);
 
 }

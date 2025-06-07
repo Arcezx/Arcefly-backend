@@ -166,7 +166,7 @@ public class ReservaService {
     }
 
     // Método auxiliar para asientos
-    private String generarAsientoDisponible(Long idViaje) {
+    public String generarAsientoDisponible(Long idViaje) {
         Random random = new Random();
         String asiento;
         int intentos = 0;

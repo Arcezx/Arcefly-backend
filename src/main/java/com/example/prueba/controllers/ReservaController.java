@@ -1,5 +1,6 @@
 package com.example.prueba.controllers;
 
+import com.example.prueba.dtos.ReservaDTO;
 import com.example.prueba.dtos.requests.CreateReservaRequest;
 import com.example.prueba.dtos.requests.UpdateReservaRequest;
 import com.example.prueba.dtos.responses.ClienteDropdownResponse;
@@ -8,6 +9,8 @@ import com.example.prueba.dtos.responses.ViajeDropdownResponse;
 import com.example.prueba.dtos.responses.ViajeResponse;
 import com.example.prueba.models.Reserva;
 import com.example.prueba.models.Usuario;
+import com.example.prueba.models.Viaje;
+import com.example.prueba.repositories.ReservaRepository;
 import com.example.prueba.services.ClienteService;
 import com.example.prueba.services.ReservaService;
 import com.example.prueba.services.ViajeService;
@@ -17,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,13 +34,15 @@ public class ReservaController {
     private final ReservaService reservaService;
     private final ViajeService viajeService;
     private final ClienteService clienteService;
+        private final ReservaRepository reservaRepo ;
 
     @Autowired
     public ReservaController(ReservaService reservaService, ViajeService viajeService,
-                             ClienteService clienteService) {
+                             ClienteService clienteService, ReservaRepository reservaRepo) {
         this.reservaService = reservaService;
         this.viajeService = viajeService;
         this.clienteService = clienteService;
+        this.reservaRepo = reservaRepo;
     }
 
     @GetMapping("/existe")
@@ -163,23 +169,43 @@ public class ReservaController {
     }
 
 
-    @PostMapping("/app/crear")
-    public ResponseEntity<?> crearReservaApp(
-            @RequestParam Long idViaje,
-            @RequestParam Long idUsuario) {
+    @PostMapping("/api/reservas/app/crear")
+    public ResponseEntity<?> crearReservaApp(@RequestBody ReservaDTO datos) {
 
-        try {
-            Reserva reserva = reservaService.crearReservaApp(idViaje, idUsuario);
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Reserva creada. Verifica tu sección de reservas.",
-                    "data", toResponse(reserva)
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", e.getMessage()
-            ));
+        if (datos.getIdViaje() == null || datos.getIdUsuario() == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Faltan datos necesarios"));
         }
+
+        /* ➊ validar que no exista ya la reserva */
+        boolean existe = reservaRepo
+                .findByIdViajeAndIdUsuario(datos.getIdViaje(), datos.getIdUsuario())
+                .isPresent();
+
+        if (existe) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Ya tienes una reserva en este vuelo"));
+        }
+
+        /* ➋ generar asiento libre */
+        String asientoLibre = reservaService.generarAsientoDisponible(datos.getIdViaje());
+
+        /* ➌ crear y guardar la reserva */
+        Reserva nueva = new Reserva();
+        nueva.setIdViaje(datos.getIdViaje());
+        nueva.setIdUsuario(datos.getIdUsuario());
+        nueva.setAsiento(asientoLibre);
+        nueva.setEstado("POR CONFIRMAR");
+        nueva.setFechaReserva(LocalDate.now());
+
+        reservaRepo.save(nueva);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Reserva creada correctamente",
+                "data", nueva
+        ));
     }
+
+
 }
