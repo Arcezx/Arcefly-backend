@@ -169,7 +169,7 @@ public class ReservaController {
     }
 
 
-    @PostMapping("/api/reservas/app/crear")
+    @PostMapping("/app/crear")
     public ResponseEntity<?> crearReservaApp(@RequestBody ReservaDTO datos) {
 
         if (datos.getIdViaje() == null || datos.getIdUsuario() == null) {

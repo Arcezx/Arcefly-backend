@@ -138,50 +138,30 @@ public class ReservaService {
     public Optional<Reserva> obtenerReservaActualDeUsuario(Long idUsuario) {
         return reservaRepository.findReservaActualByUsuario(idUsuario);
     }
-    @Transactional
-    public Reserva crearReservaApp(Long idViaje, Long idUsuario) {
-        // 1. Validar existencia
-        Viaje viaje = viajeRepository.findById(idViaje)
-                .orElseThrow(() -> new EntityNotFoundException("Viaje no encontrado"));
-        Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
-        // 2. Validar reserva existente
-        if (reservaRepository.existsByIdUsuarioAndIdViaje(idUsuario, idViaje)) {
-            throw new IllegalStateException("Ya tienes una reserva para este viaje");
-        }
-
-        // 3. Generar asiento aleatorio disponible
-        String asiento = generarAsientoDisponible(idViaje);
-
-        // 4. Crear reserva
-        Reserva reserva = new Reserva();
-        reserva.setViaje(viaje);
-        reserva.setUsuario(usuario);
-        reserva.setAsiento(asiento);
-        reserva.setEstado("POR CONFIRMAR");
-        reserva.setFechaReserva(LocalDate.now());
-
-        return reservaRepository.save(reserva);
-    }
 
     // Método auxiliar para asientos
+    // ReservaService.java  (añade al final) ─────────────────────────────────
     public String generarAsientoDisponible(Long idViaje) {
-        Random random = new Random();
-        String asiento;
-        int intentos = 0;
+
+        final int FILAS = 30;
+        final String[] LETRAS = {"A","B","C","D","E","F"};
+
+        List<String> ocupados = reservaRepository.findAll().stream()
+                .filter(r -> r.getIdViaje().equals(idViaje))
+                .map(Reserva::getAsiento)
+                .toList();
+
+        String candidato;
+        Random rnd = new Random();
 
         do {
-            char fila = (char) ('A' + random.nextInt(6));
-            int numero = 1 + random.nextInt(20);
-            asiento = fila + String.valueOf(numero);
-            intentos++;
+            int  fila  = rnd.nextInt(FILAS) + 1;
+            String letra = LETRAS[rnd.nextInt(LETRAS.length)];
+            candidato = fila + letra;
+        } while (ocupados.contains(candidato));
 
-            if (intentos > 100) {
-                throw new IllegalStateException("No hay asientos disponibles");
-            }
-        } while (!validarDisponibilidadAsiento(idViaje, asiento));
-
-        return asiento;
+        return candidato;
     }
+
 }
