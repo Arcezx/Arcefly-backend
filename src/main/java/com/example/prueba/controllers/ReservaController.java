@@ -35,14 +35,16 @@ public class ReservaController {
     private final ViajeService viajeService;
     private final ClienteService clienteService;
         private final ReservaRepository reservaRepo ;
+    private final ReservaRepository reservaRepository;
 
     @Autowired
     public ReservaController(ReservaService reservaService, ViajeService viajeService,
-                             ClienteService clienteService, ReservaRepository reservaRepo) {
+                             ClienteService clienteService, ReservaRepository reservaRepo, ReservaRepository reservaRepository) {
         this.reservaService = reservaService;
         this.viajeService = viajeService;
         this.clienteService = clienteService;
         this.reservaRepo = reservaRepo;
+        this.reservaRepository = reservaRepository;
     }
 
     @GetMapping("/existe")
@@ -205,6 +207,21 @@ public class ReservaController {
                 "message", "Reserva creada correctamente",
                 "data", nueva
         ));
+    }
+
+    // 1)  Asientos ocupados de un vuelo  ──────────────────────────────
+    @GetMapping("/ocupados/{idViaje}")
+    public ResponseEntity<List<String>> asientosOcupados(@PathVariable Long idViaje) {
+
+        // sacamos solo los asientos (Strings) de ese vuelo
+        List<String> ocupados = reservaRepository.findByIdViaje(idViaje)
+                .stream()
+                .map(Reserva::getAsiento)
+                .toList();
+
+        return ocupados.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(ocupados);
     }
 
 
