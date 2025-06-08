@@ -42,7 +42,10 @@ public class SecurityConfig {
                 "https://arcefly.netlify.app",
                 "http://localhost:4200",
                 "http://localhost:8101",
-                "http://localhost:8100"
+                "http://localhost:8100",
+                "capacitor://localhost",
+                "https://*",
+                "*"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
