@@ -39,10 +39,12 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // Orígenes permitidos (agrega los que necesites)
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:8100",  // Ionic en desarrollo
-                "capacitor://localhost",  // Android
-                "ionic://localhost",      // iOS/Android
-                "https://arcefly.netlify.app"  // Tu frontend web
+                "http://localhost:8100",
+                "capacitor://localhost",
+                "ionic://localhost",
+                "https://arcefly.netlify.app",
+                "https://arcefly-backend.onrender.com"
+
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
