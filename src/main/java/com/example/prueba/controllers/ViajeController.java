@@ -101,7 +101,7 @@ public class ViajeController {
                 .toList();
     }
 
-    //
+
 
     @GetMapping("/busqueda-completa")
     public ResponseEntity<?> buscarVuelosCompletos(
@@ -112,18 +112,15 @@ public class ViajeController {
             @RequestParam Long idUsuario) {
 
         try {
-            // 1. Validación de parámetros
             if (origen == null || origen.isBlank() || destino == null || destino.isBlank()) {
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Origen y destino son requeridos"
                 ));
             }
 
-            // 2. Normalización de parámetros
             origen = origen.trim().toLowerCase();
             destino = destino.trim().toLowerCase();
 
-            // 3. Parseo de fechas con formato ISO (YYYY-MM-DD)
             LocalDate fechaInicioDate;
             LocalDate fechaFinDate;
 
@@ -136,7 +133,6 @@ public class ViajeController {
                 ));
             }
 
-            // 4. Búsqueda exacta (origen + destino + fechas)
             List<Viaje> vuelosExactos = Optional.ofNullable(
                     viajeService.findByOrigenAndDestinoAndFechas(
                             origen,
@@ -146,7 +142,6 @@ public class ViajeController {
                     )
             ).orElse(new ArrayList<>());
 
-            // 5. Filtrar viajes ya reservados por el usuario
             List<Long> idsReservados = Optional.ofNullable(
                     reservaRepository.findViajesReservadosPorUsuario(idUsuario)
             ).orElse(new ArrayList<>());
@@ -155,7 +150,6 @@ public class ViajeController {
                     .filter(v -> !idsReservados.contains(v.getId()))
                     .collect(Collectors.toList());
 
-            // 6. Si hay resultados exactos, retornarlos
             if (!disponibles.isEmpty()) {
                 return ResponseEntity.ok(Map.of(
                         "tipo", "exactos",
@@ -164,7 +158,6 @@ public class ViajeController {
                 ));
             }
 
-            // 7. Búsqueda alternativa (solo origen + destino)
             List<Viaje> alternativos = viajeService.findByOrigenAndDestino(origen, destino)
                     .stream()
                     .filter(v -> !idsReservados.contains(v.getId()))
@@ -172,7 +165,6 @@ public class ViajeController {
                     .limit(5)
                     .collect(Collectors.toList());
 
-            // 8. Retornar resultados alternativos o mensaje de no encontrados
             return ResponseEntity.ok(Map.of(
                     "tipo", alternativos.isEmpty() ? "ninguno" : "alternativos",
                     "vuelos", alternativos,
@@ -182,14 +174,13 @@ public class ViajeController {
             ));
 
         } catch (Exception e) {
-            // 9. Manejo de errores inesperados con log
             System.out.println("❌ ERROR inesperado en /busqueda-completa:");
             System.out.println("Origen: " + origen);
             System.out.println("Destino: " + destino);
             System.out.println("FechaInicio: " + fechaInicio);
             System.out.println("FechaFin: " + fechaFin);
             System.out.println("ID Usuario: " + idUsuario);
-            e.printStackTrace(); // ✅ Log completo en Render
+            e.printStackTrace();
 
             return ResponseEntity.internalServerError().body(Map.of(
                     "error", "Error al procesar la búsqueda",
@@ -198,7 +189,6 @@ public class ViajeController {
         }
     }
 
-    // -------------- NUEVO ---------------
     @GetMapping("/por-destino")
     public ResponseEntity<List<Viaje>> buscarSoloPorDestino(
             @RequestParam String destino,

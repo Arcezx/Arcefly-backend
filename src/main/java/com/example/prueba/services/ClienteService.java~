@@ -74,6 +74,7 @@ public class ClienteService {
         usuarioRepo.deleteById(id);
     }
 
+    // Nuevo método para obtener clientes activos
     public List<Usuario> listarClientesActivos() {
         return usuarioRepo.findByTipoUsuarioInAndEstado(
                 List.of("ESTANDAR", "PREMIUM"),

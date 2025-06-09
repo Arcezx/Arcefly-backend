@@ -139,9 +139,6 @@ public class ReservaService {
         return reservaRepository.findReservaActualByUsuario(idUsuario);
     }
 
-
-    // Método auxiliar para asientos
-    // ReservaService.java  (añade al final) ─────────────────────────────────
     public String generarAsientoDisponible(Long idViaje) {
 
         final int FILAS = 30;
